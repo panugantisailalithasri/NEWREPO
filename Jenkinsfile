@@ -1,43 +1,27 @@
 pipeline {
-    agent { label 'dev' }
+    agent any
 
-    environment {
-        MESSAGE = "Hello from Jenkins!"
-    }
+    // tools {
+        // maven 'MAVEN_HOME'  // Make sure Maven is configured with this name
+    // }
 
     stages {
-        stage('Initialization') {
+        stage('Clone GitHub Repo') {
             steps {
-                echo 'Starting the pipeline...'
+                git url: 'https://github.com/panugantisailalithasri/NEWREPO.git', branch: 'master'
             }
         }
 
-        stage('Build') {
+        stage('Build using pom.xml') {
             steps {
-                echo 'Building the project...'
-                echo "Build number is: ${env.BUILD_NUMBER}"
+                sh 'mvn clean package'
             }
         }
 
-        stage('Test') {
+        stage('Archive .jar Artifact') {
             steps {
-                echo 'Running tests...'
+                archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
             }
-        }
-
-        stage('Deploy') {
-            steps {
-                echo 'Deploying application...'
-            }
-        }
-    }
-
-    post {
-        success {
-            echo 'Pipeline executed successfully!'
-        }
-        failure {
-            echo 'Pipeline failed. Please check the logs.'
         }
     }
 }
